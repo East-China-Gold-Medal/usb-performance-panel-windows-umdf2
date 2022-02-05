@@ -18,15 +18,16 @@
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
     </Filter>
   </ItemGroup>
-  <ItemGroup>    
+  <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <Inf Include="UsbPerformancePanel.inf">
       <Filter>Driver Files</Filter>
     </Inf>
   </ItemGroup>
-  <ItemGroup>    
+  <ItemGroup>
     <ClInclude Include="Device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -47,7 +48,7 @@
     <ClCompile Include="Driver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-   <ClCompile Include="Queue.c">
+    <ClCompile Include="Queue.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
