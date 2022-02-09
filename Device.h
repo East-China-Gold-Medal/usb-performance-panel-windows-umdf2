@@ -1,51 +1,30 @@
-/*++
+#ifndef DEVICE_H
+#define DEVICE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+typedef enum {
+    DATA_CPU_USAGE = 0b00000001,
+    DATA_RAM_USAGE = 0b00000010,
+    //...
+    DATA_MAX_OUT = 0b10000000
+}PanelDataCapability;
+typedef struct _DEVICE_CONTEXT {
+    WDFUSBDEVICE        UsbDevice;
+    WDFUSBINTERFACE     UsbInterface;
+    PanelDataCapability DevicePanelDataCapability;
+} DEVICE_CONTEXT, * PDEVICE_CONTEXT;
 
-Module Name:
+WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, GetDeviceContext)
+extern const __declspec(selectany) LONGLONG DEFAULT_CONTROL_TRANSFER_TIMEOUT = 5 * -1 * WDF_TIMEOUT_TO_SEC;
+_IRQL_requires_(PASSIVE_LEVEL)
+NTSTATUS SendUsage(PDEVICE_CONTEXT DevContext, PanelDataCapability cap, UCHAR data);
 
-    device.h
+NTSTATUS UsbPerformancePanelCreateDevice(_Inout_ PWDFDEVICE_INIT DeviceInit);
 
-Abstract:
-
-    This file contains the device definitions.
-
-Environment:
-
-    User-mode Driver Framework 2
-
---*/
-
-EXTERN_C_START
-
-//
-// The device context performs the same job as
-// a WDM device extension in the driver frameworks
-//
-typedef struct _DEVICE_CONTEXT
-{
-    WDFUSBDEVICE UsbDevice;
-    ULONG PrivateDeviceData;  // just a placeholder
-
-} DEVICE_CONTEXT, *PDEVICE_CONTEXT;
-
-//
-// This macro will generate an inline function called DeviceGetContext
-// which will be used to get a pointer to the device context memory
-// in a type safe manner.
-//
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, DeviceGetContext)
-
-//
-// Function to initialize the device's queues and callbacks
-//
-NTSTATUS
-UsbPerformancePanelCreateDevice(
-    _Inout_ PWDFDEVICE_INIT DeviceInit
-    );
-
-//
-// Function to select the device's USB configuration and get a WDFUSBDEVICE
-// handle
-//
 EVT_WDF_DEVICE_PREPARE_HARDWARE UsbPerformancePanelEvtDevicePrepareHardware;
 
-EXTERN_C_END
+#ifdef __cplusplus
+}
+#endif
+#endif

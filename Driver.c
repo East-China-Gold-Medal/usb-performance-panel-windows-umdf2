@@ -89,11 +89,7 @@ Return Value:
     return status;
 }
 
-NTSTATUS
-UsbPerformancePanelEvtDeviceAdd(
-    _In_    WDFDRIVER       Driver,
-    _Inout_ PWDFDEVICE_INIT DeviceInit
-    )
+NTSTATUS UsbPerformancePanelEvtDeviceAdd(_In_ WDFDRIVER Driver,_Inout_ PWDFDEVICE_INIT DeviceInit)
 /*++
 Routine Description:
 

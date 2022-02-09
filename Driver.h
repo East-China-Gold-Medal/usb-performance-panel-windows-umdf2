@@ -21,7 +21,6 @@ Environment:
 #include <initguid.h>
 
 #include "device.h"
-#include "queue.h"
 #include "trace.h"
 
 EXTERN_C_START
