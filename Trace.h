@@ -1,3 +1,5 @@
+#ifndef TRACE_H
+#define TRACE_H
 /*++
 
 Module Name:
@@ -61,3 +63,4 @@ DEFINE_GUID(GUID_DEVINTERFACE_UsbPerformancePanel,
 // end_wpp
 //
 
+#endif

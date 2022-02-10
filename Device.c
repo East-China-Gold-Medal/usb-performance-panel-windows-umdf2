@@ -16,8 +16,7 @@ Environment:
 
 #include "driver.h"
 #include "device.tmh"
-
-
+#include "Trace.h"
 
 NTSTATUS UsbPerformancePanelCreateDevice(_Inout_ PWDFDEVICE_INIT DeviceInit)
 /*++
@@ -66,7 +65,7 @@ Return Value:
 		//
 		// Initialize the context.
 		//
-#pragma messge "Get Val from device!"
+#pragma message("Get Val from device!")
 		deviceContext->DevicePanelDataCapability = DATA_CPU_USAGE|DATA_RAM_USAGE;
 
 		//
@@ -176,19 +175,38 @@ Return Value:
 
 	return status;
 }
-NTSTATUS SendUsage(PDEVICE_CONTEXT DevContext,PanelDataCapability cap,UCHAR data)
+_IRQL_requires_(PASSIVE_LEVEL)
+NTSTATUS SendUsage(PDEVICE_CONTEXT DevContext, PanelDataCapability cap, UCHAR data)
 {
+	/*++
+
+Routine Description:
+
+	Worker routine send a specific usage of one specific hardware.
+
+Arguments:
+
+	DevContext:Device context.
+	cap:The PanelDataCapability of your selection.
+	data:raw data.
+
+Return Value:
+
+	NTSTATUS
+
+--*/
 	NTSTATUS status;
 	WDF_USB_CONTROL_SETUP_PACKET    controlSetupPacket;
 	WDF_REQUEST_SEND_OPTIONS        sendOptions;
 	WDF_MEMORY_DESCRIPTOR memDesc;
 	ULONG    bytesTransferred;
+	UCHAR	 returnVal=0;
 	PAGED_CODE();
 	TraceEvents(TRACE_LEVEL_VERBOSE, TRACE_DEVICE, "-->TransportUsage\n");
 	WDF_REQUEST_SEND_OPTIONS_INIT(&sendOptions,WDF_REQUEST_SEND_OPTION_TIMEOUT);
 	WDF_REQUEST_SEND_OPTIONS_SET_TIMEOUT(&sendOptions,DEFAULT_CONTROL_TRANSFER_TIMEOUT);
-	WDF_USB_CONTROL_SETUP_PACKET_INIT_VENDOR(&controlSetupPacket,BmRequestHostToDevice,BmRequestToDevice,cap,0,0); 
-	WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&memDesc,&data,sizeof(UCHAR));
+	WDF_USB_CONTROL_SETUP_PACKET_INIT_VENDOR(&controlSetupPacket,BmRequestHostToDevice,BmRequestToDevice,COMMAND_SET_USAGE,((UCHAR)cap<<8)|data,0); 
+	WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&memDesc,&returnVal,sizeof(UCHAR));
 	status = WdfUsbTargetDeviceSendControlTransferSynchronously(DevContext->UsbDevice,NULL,&sendOptions,&controlSetupPacket,&memDesc,&bytesTransferred);
 	if (!NT_SUCCESS(status)) {
 		TraceEvents(TRACE_LEVEL_ERROR, TRACE_DEVICE,

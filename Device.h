@@ -3,17 +3,27 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <windows.h>
+#include <wdf.h>
+#include <usb.h>
+#include <wdfusb.h>
+#include <initguid.h>
 typedef enum {
     DATA_CPU_USAGE = 0b00000001,
     DATA_RAM_USAGE = 0b00000010,
     //...
     DATA_MAX_OUT = 0b10000000
 }PanelDataCapability;
+typedef enum {
+    COMMAND_QUERY_CAP = 0xFF,
+    COMMAND_SET_USAGE = 0xFE
+}HostOperationCommand;
 typedef struct _DEVICE_CONTEXT {
     WDFUSBDEVICE        UsbDevice;
     WDFUSBINTERFACE     UsbInterface;
     PanelDataCapability DevicePanelDataCapability;
 } DEVICE_CONTEXT, * PDEVICE_CONTEXT;
+
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, GetDeviceContext)
 extern const __declspec(selectany) LONGLONG DEFAULT_CONTROL_TRANSFER_TIMEOUT = 5 * -1 * WDF_TIMEOUT_TO_SEC;
