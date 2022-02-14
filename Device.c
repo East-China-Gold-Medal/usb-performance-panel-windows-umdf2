@@ -66,15 +66,12 @@ Return Value:
 		//
 		// Initialize the context.
 		//
-#pragma message("Get Val from device!")
-		deviceContext->DevicePanelDataCapability = DATA_CPU_USAGE|DATA_RAM_USAGE;
 
 		//
 		// Create a device interface so that applications can find and talk
 		// to us.
 		//
 		status = WdfDeviceCreateDeviceInterface(device,&GUID_DEVINTERFACE_UsbPerformancePanel,NULL);
-		//SendUsage(deviceContext,0x02,0xFF);
 	}
 
 	return status;
@@ -172,7 +169,14 @@ Return Value:
 			"WdfUsbTargetDeviceSelectConfig failed 0x%x", status);
 		return status;
 	}
-
+	PanelDataCapability cap=0;
+	status = GetDataCapability(pDeviceContext, &cap);
+	if (!NT_SUCCESS(status)) {
+		pDeviceContext->DevicePanelDataCapability = 0x03;//fallback val.
+	}
+	else {
+		pDeviceContext->DevicePanelDataCapability = cap;
+	}
 	TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
 	pDeviceContext->DelayTime = 1000;
 	// Start the Monitor thread!
@@ -210,17 +214,12 @@ Return Value:
 	NTSTATUS status = 0;
 	WDF_USB_CONTROL_SETUP_PACKET    controlSetupPacket;
 	WDF_REQUEST_SEND_OPTIONS        sendOptions;
-	WDF_MEMORY_DESCRIPTOR memDesc;
-	ULONG    bytesTransferred;
-	(void)DevContext;
-	UCHAR	 returnVal=0;
 	PAGED_CODE();
 	TraceEvents(TRACE_LEVEL_VERBOSE, TRACE_DEVICE, "-->TransportUsage\n");
 	WDF_REQUEST_SEND_OPTIONS_INIT(&sendOptions,WDF_REQUEST_SEND_OPTION_TIMEOUT);
 	WDF_REQUEST_SEND_OPTIONS_SET_TIMEOUT(&sendOptions,DEFAULT_CONTROL_TRANSFER_TIMEOUT);
-	WDF_USB_CONTROL_SETUP_PACKET_INIT_VENDOR(&controlSetupPacket,BmRequestHostToDevice,BmRequestToDevice,COMMAND_SET_USAGE,((UCHAR)cap<<8)|data,0); 
-	WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&memDesc,&returnVal,sizeof(UCHAR));
-	status = WdfUsbTargetDeviceSendControlTransferSynchronously(DevContext->UsbDevice,NULL,&sendOptions,&controlSetupPacket,&memDesc,&bytesTransferred);
+	WDF_USB_CONTROL_SETUP_PACKET_INIT_VENDOR(&controlSetupPacket,BmRequestHostToDevice,BmRequestToDevice,COMMAND_SET_USAGE,((UCHAR)cap<<8)|data,2); 
+	status = WdfUsbTargetDeviceSendControlTransferSynchronously(DevContext->UsbDevice,NULL,&sendOptions,&controlSetupPacket,NULL,NULL);
 	if (!NT_SUCCESS(status)) {
 		STATUS_IO_TIMEOUT;
 		TraceEvents(TRACE_LEVEL_ERROR, TRACE_DEVICE,
@@ -230,8 +229,33 @@ Return Value:
 	else {
 		TraceEvents(TRACE_LEVEL_VERBOSE, TRACE_DEVICE,
 			"SetSevenSegmentState: 0x%x usage is 0x%x\n",cap,data);
-		PrintDebug("Success:0x%x\n", returnVal);
+		PrintDebug("Success\n");
 	}
 	TraceEvents(TRACE_LEVEL_VERBOSE, TRACE_DEVICE, "<--TransportUsage\n");
+	return status;
+}
+NTSTATUS GetDataCapability(PDEVICE_CONTEXT DevContext, PanelDataCapability* ReceiveBuffer)
+{
+	WDF_USB_CONTROL_SETUP_PACKET    controlSetupPacket;
+	WDF_REQUEST_SEND_OPTIONS        sendOptions;
+	ULONG byteTransferred;
+	WDF_MEMORY_DESCRIPTOR memDesc;
+	WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&memDesc, ReceiveBuffer, sizeof(UCHAR));
+	WDF_REQUEST_SEND_OPTIONS_INIT(&sendOptions, WDF_REQUEST_SEND_OPTION_TIMEOUT);
+	WDF_REQUEST_SEND_OPTIONS_SET_TIMEOUT(&sendOptions, DEFAULT_CONTROL_TRANSFER_TIMEOUT);
+	WDF_USB_CONTROL_SETUP_PACKET_INIT_VENDOR(&controlSetupPacket, BmRequestDeviceToHost, BmRequestToDevice,COMMAND_QUERY_CAP,0,2);
+	NTSTATUS status = WdfUsbTargetDeviceSendControlTransferSynchronously(DevContext->UsbDevice, NULL, &sendOptions, &controlSetupPacket, &memDesc, &byteTransferred);
+
+	if (!NT_SUCCESS(status)) {
+		STATUS_IO_TIMEOUT;
+		TraceEvents(TRACE_LEVEL_ERROR, TRACE_DEVICE,
+			"Failed to set Usage - 0x%x \n", status);
+		PrintDebug("Failed:0x%x\n", status);
+	}
+	else {
+		TraceEvents(TRACE_LEVEL_VERBOSE, TRACE_DEVICE,
+			"GetCompat: 0x%x bytes: 0x%x\n", byteTransferred, *ReceiveBuffer);
+		PrintDebug("GetCompat: 0x%x bytes: 0x%x\n", byteTransferred, *ReceiveBuffer);
+	}
 	return status;
 }

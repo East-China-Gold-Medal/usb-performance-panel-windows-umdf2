@@ -35,6 +35,7 @@ NTSTATUS SendUsage(PDEVICE_CONTEXT DevContext, PanelDataCapability cap, UCHAR da
 
 NTSTATUS UsbPerformancePanelCreateDevice(_Inout_ PWDFDEVICE_INIT DeviceInit);
 
+NTSTATUS GetDataCapability(PDEVICE_CONTEXT DevContext, PanelDataCapability* ReceiveBuffer);
 EVT_WDF_DEVICE_PREPARE_HARDWARE UsbPerformancePanelEvtDevicePrepareHardware;
 
 #ifdef __cplusplus

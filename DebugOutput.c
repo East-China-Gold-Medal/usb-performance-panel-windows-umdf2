@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "DebugOutput.h"
+#ifdef DEBUG_OUTPUT
 FILE* debugFp;
 
 VOID StartDebug(VOID) {
@@ -11,3 +12,4 @@ VOID StartDebug(VOID) {
 VOID StopDebug(VOID) {
 	fclose(debugFp);
 }
+#endif
