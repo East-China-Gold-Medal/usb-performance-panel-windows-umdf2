@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 /*++
 
 Module Name:
@@ -17,6 +18,7 @@ Environment:
 #include "driver.h"
 #include "driver.tmh"
 
+#include "DebugOutput.h"
 
 NTSTATUS
 DriverEntry(
@@ -59,7 +61,8 @@ Return Value:
     WPP_INIT_TRACING( DriverObject, RegistryPath );
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
-
+    StartDebug();
+    PrintDebug("Driver Entry......");
     //
     // Register a cleanup callback so that we can call WPP_CLEANUP when
     // the framework driver object is deleted during driver unload.
@@ -81,11 +84,12 @@ Return Value:
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDriverCreate failed %!STATUS!", status);
         WPP_CLEANUP(DriverObject);
+        PrintDebug("Failed\n");
         return status;
     }
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
-
+    PrintDebug("Done\n");
     return status;
 }
 
@@ -144,7 +148,8 @@ Return Value:
     UNREFERENCED_PARAMETER(DriverObject);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
-
+    StopDebug();
+    WdfTimerStop(GetDeviceContext(DriverObject)->Timer,TRUE);
     //
     // Stop WPP Tracing
     //

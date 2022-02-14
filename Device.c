@@ -17,7 +17,8 @@ Environment:
 #include "driver.h"
 #include "device.tmh"
 #include "Trace.h"
-
+#include "MonitorThread.h"
+#include "DebugOutput.h"
 NTSTATUS UsbPerformancePanelCreateDevice(_Inout_ PWDFDEVICE_INIT DeviceInit)
 /*++
 
@@ -73,6 +74,7 @@ Return Value:
 		// to us.
 		//
 		status = WdfDeviceCreateDeviceInterface(device,&GUID_DEVINTERFACE_UsbPerformancePanel,NULL);
+		//SendUsage(deviceContext,0x02,0xFF);
 	}
 
 	return status;
@@ -172,7 +174,16 @@ Return Value:
 	}
 
 	TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
-
+	pDeviceContext->DelayTime = 1000;
+	// Start the Monitor thread!
+	WDFTIMER ret = StartMonitorThread(Device);
+	if (ret == NULL) {
+		PrintDebug("Start thread failed.\n");
+		StopDebug();
+		ExitProcess(3);
+	}
+	pDeviceContext->Timer = ret;
+	PrintDebug("Thread started.\n");
 	return status;
 }
 _IRQL_requires_(PASSIVE_LEVEL)
@@ -195,11 +206,13 @@ Return Value:
 	NTSTATUS
 
 --*/
-	NTSTATUS status;
+	PrintDebug("Sending 0x%x->0x%x......",cap,data);
+	NTSTATUS status = 0;
 	WDF_USB_CONTROL_SETUP_PACKET    controlSetupPacket;
 	WDF_REQUEST_SEND_OPTIONS        sendOptions;
 	WDF_MEMORY_DESCRIPTOR memDesc;
 	ULONG    bytesTransferred;
+	(void)DevContext;
 	UCHAR	 returnVal=0;
 	PAGED_CODE();
 	TraceEvents(TRACE_LEVEL_VERBOSE, TRACE_DEVICE, "-->TransportUsage\n");
@@ -209,12 +222,15 @@ Return Value:
 	WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&memDesc,&returnVal,sizeof(UCHAR));
 	status = WdfUsbTargetDeviceSendControlTransferSynchronously(DevContext->UsbDevice,NULL,&sendOptions,&controlSetupPacket,&memDesc,&bytesTransferred);
 	if (!NT_SUCCESS(status)) {
+		STATUS_IO_TIMEOUT;
 		TraceEvents(TRACE_LEVEL_ERROR, TRACE_DEVICE,
 			"Failed to set Usage - 0x%x \n", status);
+		PrintDebug("Failed:0x%x\n",status);
 	}
 	else {
 		TraceEvents(TRACE_LEVEL_VERBOSE, TRACE_DEVICE,
 			"SetSevenSegmentState: 0x%x usage is 0x%x\n",cap,data);
+		PrintDebug("Success:0x%x\n", returnVal);
 	}
 	TraceEvents(TRACE_LEVEL_VERBOSE, TRACE_DEVICE, "<--TransportUsage\n");
 	return status;

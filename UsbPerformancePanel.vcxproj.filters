@@ -40,6 +40,9 @@
     <ClInclude Include="MonitorThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DebugOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.c">
@@ -49,6 +52,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MonitorThread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugOutput.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

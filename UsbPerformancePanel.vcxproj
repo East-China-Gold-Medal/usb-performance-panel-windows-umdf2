@@ -39,11 +39,13 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DebugOutput.c" />
     <ClCompile Include="Device.c" />
     <ClCompile Include="Driver.c" />
     <ClCompile Include="MonitorThread.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DebugOutput.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="Driver.h" />
     <ClInclude Include="MonitorThread.h" />

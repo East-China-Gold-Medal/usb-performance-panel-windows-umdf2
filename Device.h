@@ -20,8 +20,11 @@ typedef enum {
 }HostOperationCommand;
 typedef struct _DEVICE_CONTEXT {
     WDFUSBDEVICE        UsbDevice;
-    WDFUSBINTERFACE     UsbInterface;
+    FILETIME IdleTime, UserTime, KernelTime, LastIdleTime, LastUserTime, LastKernelTime;
+    MEMORYSTATUSEX Statex;
     PanelDataCapability DevicePanelDataCapability;
+    ULONG DelayTime;
+    WDFTIMER Timer;
 } DEVICE_CONTEXT, * PDEVICE_CONTEXT;
 
 
