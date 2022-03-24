@@ -218,7 +218,7 @@ Return Value:
 	TraceEvents(TRACE_LEVEL_VERBOSE, TRACE_DEVICE, "-->TransportUsage\n");
 	WDF_REQUEST_SEND_OPTIONS_INIT(&sendOptions,WDF_REQUEST_SEND_OPTION_TIMEOUT);
 	WDF_REQUEST_SEND_OPTIONS_SET_TIMEOUT(&sendOptions,DEFAULT_CONTROL_TRANSFER_TIMEOUT);
-	WDF_USB_CONTROL_SETUP_PACKET_INIT_VENDOR(&controlSetupPacket,BmRequestHostToDevice,BmRequestToDevice,COMMAND_SET_USAGE,((UCHAR)cap<<8)|data,2); 
+	WDF_USB_CONTROL_SETUP_PACKET_INIT_VENDOR(&controlSetupPacket,BmRequestHostToDevice,BmRequestToDevice,COMMAND_SET_USAGE,((UCHAR)cap<<8)|data, CONTROL_CHANNEL);
 	status = WdfUsbTargetDeviceSendControlTransferSynchronously(DevContext->UsbDevice,NULL,&sendOptions,&controlSetupPacket,NULL,NULL);
 	if (!NT_SUCCESS(status)) {
 		STATUS_IO_TIMEOUT;
@@ -243,7 +243,7 @@ NTSTATUS GetDataCapability(PDEVICE_CONTEXT DevContext, PanelDataCapability* Rece
 	WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&memDesc, ReceiveBuffer, sizeof(UCHAR));
 	WDF_REQUEST_SEND_OPTIONS_INIT(&sendOptions, WDF_REQUEST_SEND_OPTION_TIMEOUT);
 	WDF_REQUEST_SEND_OPTIONS_SET_TIMEOUT(&sendOptions, DEFAULT_CONTROL_TRANSFER_TIMEOUT);
-	WDF_USB_CONTROL_SETUP_PACKET_INIT_VENDOR(&controlSetupPacket, BmRequestDeviceToHost, BmRequestToDevice,COMMAND_QUERY_CAP,0,2);
+	WDF_USB_CONTROL_SETUP_PACKET_INIT_VENDOR(&controlSetupPacket, BmRequestDeviceToHost, BmRequestToDevice,COMMAND_QUERY_CAP,0, CONTROL_CHANNEL);
 	NTSTATUS status = WdfUsbTargetDeviceSendControlTransferSynchronously(DevContext->UsbDevice, NULL, &sendOptions, &controlSetupPacket, &memDesc, &byteTransferred);
 
 	if (!NT_SUCCESS(status)) {
