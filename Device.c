@@ -1,18 +1,9 @@
-/*++
+/* @file
 
-Module Name:
+	Implementation of device registration & callback handling.
+	SPDX-License-Identifier: WTFPL
 
-	device.c - Device handling events for example driver.
-
-Abstract:
-
-   This file contains the device entry points and callbacks.
-
-Environment:
-
-	User-mode Driver Framework 2
-
---*/
+*/
 
 #include "driver.h"
 #include "device.tmh"

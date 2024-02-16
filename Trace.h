@@ -1,3 +1,9 @@
+/* @file
+
+    The default trace method by Windows.
+    SPDX-License-Identifier: WTFPL
+
+*/
 #ifndef TRACE_H
 #define TRACE_H
 /*++

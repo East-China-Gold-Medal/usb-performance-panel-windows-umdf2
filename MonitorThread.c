@@ -1,3 +1,9 @@
+/* @file
+
+    The main monitor thread that collects & sends data.
+    SPDX-License-Identifier: WTFPL
+
+*/
 #include "MonitorThread.h"
 #include "DebugOutput.h"
 #include <processthreadsapi.h>

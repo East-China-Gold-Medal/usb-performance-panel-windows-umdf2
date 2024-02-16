@@ -1,3 +1,9 @@
+/* @file
+
+	Implementation of an alternative debug interface that logs onto disk.
+	SPDX-License-Identifier: WTFPL
+
+*/
 #define _CRT_SECURE_NO_WARNINGS
 #include "DebugOutput.h"
 #ifdef DEBUG_OUTPUT

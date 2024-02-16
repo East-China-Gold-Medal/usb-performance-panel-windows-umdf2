@@ -1,3 +1,10 @@
+/* @file
+
+    Implementation of flow (Ba-Gu) code.
+    SPDX-License-Identifier: WTFPL
+
+*/
+
 #define _CRT_SECURE_NO_WARNINGS
 /*++
 

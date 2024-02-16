@@ -1,8 +1,13 @@
+/* @file
+
+    Definition of device registration & callback handling.
+    SPDX-License-Identifier: WTFPL
+
+*/
+
 #ifndef DEVICE_H
 #define DEVICE_H
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 #include <windows.h>
 #include <wdf.h>
 #include <usb.h>
@@ -28,8 +33,11 @@ typedef struct _DEVICE_CONTEXT {
 } DEVICE_CONTEXT, * PDEVICE_CONTEXT;
 #define CONTROL_CHANNEL 0
 
+EXTERN_C_START
+
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, GetDeviceContext)
 extern const __declspec(selectany) LONGLONG DEFAULT_CONTROL_TRANSFER_TIMEOUT = 5 * -1 * WDF_TIMEOUT_TO_SEC;
+
 _IRQL_requires_(PASSIVE_LEVEL)
 NTSTATUS SendUsage(PDEVICE_CONTEXT DevContext, PanelDataCapability cap, UCHAR data);
 
@@ -38,7 +46,5 @@ NTSTATUS UsbPerformancePanelCreateDevice(_Inout_ PWDFDEVICE_INIT DeviceInit);
 NTSTATUS GetDataCapability(PDEVICE_CONTEXT DevContext, PanelDataCapability* ReceiveBuffer);
 EVT_WDF_DEVICE_PREPARE_HARDWARE UsbPerformancePanelEvtDevicePrepareHardware;
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END
 #endif

@@ -1,18 +1,10 @@
-/*++
+/* @file
 
-Module Name:
+    Definition of flow (Ba-Gu) code.
+    SPDX-License-Identifier: WTFPL
 
-    driver.h
+*/
 
-Abstract:
-
-    This file contains the driver definitions.
-
-Environment:
-
-    User-mode Driver Framework 2
-
---*/
 
 #include <windows.h>
 #include <wdf.h>
